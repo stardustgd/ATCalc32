@@ -1,0 +1,6 @@
+CompileFlags:
+  Add:
+    - "-I"
+    - "/usr/avr/include"
+    - "--target=avr"
+    - "-mmcu=atmega32"
