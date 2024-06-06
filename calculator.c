@@ -42,8 +42,6 @@ void calculatorMode() {
   char inputOne[17] = {'\0'};
   char inputTwo[17] = {'\0'};
 
-  cursor_blink_on();
-
   getInput(inputOne, &entries, 0);
   lcd_pos(1, 0);
   getInput(inputTwo, &entries, 1);

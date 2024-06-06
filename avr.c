@@ -6,6 +6,7 @@ void avr_init(void) {
 
   // set up LCD
   lcd_init();
+  cursor_blink_on();
 }
 
 void wait_ms(unsigned short msec) {
