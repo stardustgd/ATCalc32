@@ -1,11 +1,12 @@
 #include "avr.h"
-#include "lcd.h"
+#include "calculator.h"
 
 int main() {
   avr_init();
+  CalcState calcState = calculateMode;
 
   while (1) {
-    lcd_pos(0, 0);
-    lcd_puts2("Hello World");
+    inputHandler(&calcState);
+    updateCalc(&calcState);
   }
 }
