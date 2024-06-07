@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define MAX_INPUTS 32
+
 static void clearInput(char *buf);
 static void getInput(char *buf);
 static bool validateInput(char *buf);
@@ -41,7 +43,7 @@ void updateCalc(CalcState *calcState) {
 }
 
 void calculatorMode() {
-  char input[33] = {'\0'};
+  char input[MAX_INPUTS + 1] = {'\0'};
 
   getInput(input);
 }
@@ -54,7 +56,8 @@ static void clearInput(char *buf) {
 static void getInput(char *buf) {
   bool valid = false;
   uint8_t entries = 0;
-  uint8_t y = 0;
+  uint8_t lcd_x = 0;
+  uint8_t lcd_y = 0;
   uint8_t input;
 
   while (!valid) {
@@ -64,8 +67,9 @@ static void getInput(char *buf) {
     if (input == STAR) {
       clearInput(buf);
       entries = 0;
-      y = 0;
-    } else if (input != NONE && input != POUND && entries < 32) {
+      lcd_y = 0;
+      lcd_x = 0;
+    } else if (input != NONE && input != POUND && entries < MAX_INPUTS) {
       switch (input) {
       case A:
         sprintf(buf + strlen(buf), "%s", "+");
@@ -84,23 +88,37 @@ static void getInput(char *buf) {
         break;
       }
 
-      lcd_pos(y, entries);
+      lcd_pos(lcd_y, lcd_x);
       lcd_put(buf[entries]);
       entries++;
+      lcd_x++;
     }
 
-    if (input == POUND && !validateInput(buf)) {
-      lcd_clr();
-      lcd_pos(0, 0);
-      lcd_puts2("Invalid input");
-      clearInput(buf);
-      wait_ms(500);
-    } else {
-      valid = true;
+    if (input == POUND) {
+      if (validateInput(buf)) {
+        valid = true;
+        lcd_clr();
+        lcd_pos(0, 0);
+        lcd_puts2("valid");
+        wait_ms(500);
+      } else {
+        lcd_clr();
+        lcd_pos(0, 0);
+        lcd_puts2("Invalid input");
+        wait_ms(1000);
+        clearInput(buf);
+        lcd_x = 0;
+        lcd_y = 0;
+        entries = 0;
+      }
     }
 
-    if (entries > 16) {
-      y = 1;
+    if (entries == (MAX_INPUTS / 2)) {
+      lcd_x = 0;
+      lcd_y = 1;
+      lcd_pos(lcd_y, lcd_x);
+    } else if (entries >= MAX_INPUTS) {
+      lcd_pos(lcd_y, 15);
     }
   }
 }
