@@ -3,7 +3,7 @@
 
 int main() {
   avr_init();
-  CalcState calcState = calculateMode;
+  CalcState calcState = MODE_CALCULATE;
 
   while (1) {
     inputHandler(&calcState);

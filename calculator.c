@@ -12,22 +12,22 @@ static void getInput(char *buf, uint8_t *entries, uint8_t x);
 void inputHandler(CalcState *calcState) {
   switch (getKey()) {
   case A:
-    *calcState = calculateMode;
+    *calcState = MODE_CALCULATE;
     break;
   case B:
-    *calcState = quizMode;
+    *calcState = MODE_QUIZ;
     break;
   }
 }
 void updateCalc(CalcState *calcState) {
   switch (*calcState) {
-  case calculateMode:
+  case MODE_CALCULATE:
     // do something
     lcd_clr();
     lcd_pos(0, 0);
     calculatorMode();
     break;
-  case quizMode:
+  case MODE_QUIZ:
     // do quiz
     lcd_clr();
     lcd_pos(0, 0);

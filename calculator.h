@@ -1,7 +1,7 @@
 #ifndef CALCULATOR_H
 #define CALCULATOR_H
 
-typedef enum { calculateMode, quizMode } CalcState;
+typedef enum { MODE_CALCULATE, MODE_QUIZ } CalcState;
 extern CalcState calcState;
 
 void inputHandler(CalcState *calcState);
