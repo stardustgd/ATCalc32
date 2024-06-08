@@ -14,6 +14,9 @@ static void clearInput(char *buf);
 static void getInput(char *buf);
 static bool validateInput(char *buf);
 static void calculateInput(char *buf);
+static void convertToPostfix(const char *infix, char *postfix);
+static int evaluateArithmetic(int a, int b, char operation);
+static int evaluateExpression(const char *postfix);
 
 void inputHandler(CalcState *calcState) {
   switch (getKey()) {
@@ -96,10 +99,8 @@ static void getInput(char *buf) {
 
     if (input == POUND) {
       if (validateInput(buf)) {
-        valid = true;
         lcd_clr();
-        lcd_pos(0, 0);
-        lcd_puts2("valid");
+        calculateInput(buf);
         wait_ms(500);
       } else {
         lcd_clr();
@@ -139,6 +140,8 @@ static bool validateInput(char *buf) {
         return false;
       }
 
+      isLastOperation = true;
+
       // The first char is an operation
       if (i == 0) {
         return false;
@@ -159,5 +162,101 @@ static bool validateInput(char *buf) {
 }
 
 static void calculateInput(char *buf) {
-  // TODO: tokenize input and solve according to PEMDAS
+  char expression[MAX_INPUTS] = {'\0'};
+
+  // Convert expression to postfix notation
+  convertToPostfix(buf, expression);
+
+  // After conversion, evaulate the expression
+  int result = evaluateExpression(expression);
+
+  // Output to LCD
+  char tmp[MAX_INPUTS] = {'\0'};
+  sprintf(tmp + strlen(tmp), "%d", result);
+  lcd_pos(0, 0);
+  lcd_puts2(tmp);
+  lcd_pos(0, strlen(tmp));
+
+  // TODO: Copy result into buf
+}
+
+static uint8_t precedence(char operation) {
+  if (operation == '+' || operation == '-') {
+    return 1;
+  }
+  if (operation == '*' || operation == '/') {
+    return 2;
+  }
+  return 0;
+}
+
+static void convertToPostfix(const char *infix, char *postfix) {
+  char stack[MAX_INPUTS * 2];
+  size_t stackTopIndex = -1;
+  uint8_t resultIndex = 0;
+  uint8_t infixLength = strlen(infix);
+
+  for (uint8_t i = 0; i < infixLength; i++) {
+    char c = infix[i];
+
+    if (isdigit(c)) {
+      while (isdigit(infix[i])) {
+        postfix[resultIndex++] = infix[i++];
+      }
+      postfix[resultIndex++] = ' ';
+      i--;
+    } else {
+      while (stackTopIndex != -1 &&
+             precedence(stack[stackTopIndex]) >= precedence(infix[i])) {
+        postfix[resultIndex++] = stack[stackTopIndex--];
+        postfix[resultIndex++] = ' ';
+      }
+      stack[++stackTopIndex] = infix[i];
+    }
+  }
+
+  while (stackTopIndex != -1) {
+    postfix[resultIndex++] = stack[stackTopIndex--];
+    postfix[resultIndex++] = ' ';
+  }
+
+  postfix[resultIndex] = '\0';
+}
+
+static int evaluateArithmetic(int a, int b, char operation) {
+  switch (operation) {
+  case '+':
+    return a + b;
+  case '-':
+    return a - b;
+  case '*':
+    return a * b;
+  case '/':
+    return a / b;
+  }
+
+  return 0;
+}
+
+static int evaluateExpression(const char *postfix) {
+  int stack[MAX_INPUTS];
+  size_t stackTopIndex = -1;
+  uint8_t postfixLength = strlen(postfix);
+
+  for (uint8_t i = 0; i < postfixLength; i++) {
+    if (isdigit(postfix[i])) {
+      long num = 0;
+      while (isdigit(postfix[i])) {
+        num = num * 10 + (postfix[i++] - '0');
+      }
+
+      stack[++stackTopIndex] = num;
+    } else if (postfix[i] != ' ') {
+      int num2 = stack[stackTopIndex--];
+      int num1 = stack[stackTopIndex--];
+      stack[++stackTopIndex] = evaluateArithmetic(num1, num2, postfix[i]);
+    }
+  }
+
+  return stack[stackTopIndex];
 }
