@@ -8,6 +8,7 @@ SRCS = $(wildcard *.c)
 OBJS = $(patsubst %.c, $(bin)/%.o, $(SRCS))
 
 cflags=-g -DF_CPU=${avrFreq} -Wall -Os -Wextra
+ldflags=-Wl,-u,vfprintf -lprintf_flt
 
 all: $(bin)/$(project).flash.hex
 
@@ -16,7 +17,7 @@ $(bin)/%.o: %.c
 	avr-gcc $(cflags) -mmcu=$(avrType) -Wa,-ahlmns=$(bin)/$(notdir $<).lst -c -o $@ $<
 
 $(bin)/$(project).elf: $(OBJS)
-	avr-gcc $(cflags) -mmcu=$(avrType) -o $@ $^
+	avr-gcc $(cflags) -mmcu=$(avrType) -o $@ $^ $(ldflags)
 
 $(bin)/$(project).flash.hex: $(bin)/$(project).elf
 	avr-objcopy -j .text -j .data -O ihex $< $@
