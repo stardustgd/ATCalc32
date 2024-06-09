@@ -38,8 +38,7 @@ void updateCalc(CalcState *calcState) {
     break;
   case MODE_QUIZ:
     lcd_clr();
-    lcd_pos(0, 0);
-    lcd_puts2("quiz");
+    lcd_pos_and_puts("quiz", 0, 0);
     wait_ms(200);
     break;
   }
@@ -91,8 +90,7 @@ static void getInput(char *buf) {
         break;
       }
 
-      lcd_pos(lcd_y, lcd_x);
-      lcd_put(buf[entries]);
+      lcd_pos_and_put(buf[entries], lcd_y, lcd_x);
       entries++;
       lcd_x++;
     }
@@ -107,8 +105,7 @@ static void getInput(char *buf) {
         wait_ms(500);
       } else {
         lcd_clr();
-        lcd_pos(0, 0);
-        lcd_puts2("Invalid input");
+        lcd_pos_and_puts("Invalid Input", 0, 0);
         wait_ms(1000);
         clearInput(buf);
         lcd_x = 0;
@@ -176,8 +173,7 @@ static void calculateInput(char *buf) {
   // Output to LCD
   char tmp[MAX_INPUTS + 1] = {'\0'};
   sprintf(tmp + strlen(tmp), "%d", result);
-  lcd_pos(0, 0);
-  lcd_puts2(tmp);
+  lcd_pos_and_puts(tmp, 0, 0);
   lcd_pos(0, strlen(tmp));
 
   // Copy result into buf

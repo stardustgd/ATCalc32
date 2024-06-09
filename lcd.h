@@ -13,6 +13,10 @@ void lcd_puts1(const char *s);
 
 void lcd_puts2(const char *s);
 
+void lcd_pos_and_put(char ch, unsigned char r, unsigned char c);
+
+void lcd_pos_and_puts(const char *s, unsigned char r, unsigned char c);
+
 void cursor_blink_on();
 
 void cursor_blink_off();

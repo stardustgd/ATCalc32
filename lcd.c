@@ -101,6 +101,16 @@ void lcd_puts2(const char *s) {
   }
 }
 
+void lcd_pos_and_put(char ch, unsigned char r, unsigned char c) {
+  lcd_pos(r, c);
+  lcd_put(ch);
+}
+
+void lcd_pos_and_puts(const char *s, unsigned char r, unsigned char c) {
+  lcd_pos(r, c);
+  lcd_puts2(s);
+}
+
 void cursor_blink_on() {
   write(0x0F, 0);
 }
