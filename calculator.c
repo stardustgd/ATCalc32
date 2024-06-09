@@ -101,6 +101,9 @@ static void getInput(char *buf) {
       if (validateInput(buf)) {
         lcd_clr();
         calculateInput(buf);
+        entries = strlen(buf);
+        lcd_x = entries % 16;
+        lcd_y = (entries > 16) ? 1 : 0;
         wait_ms(500);
       } else {
         lcd_clr();
@@ -171,13 +174,16 @@ static void calculateInput(char *buf) {
   int result = evaluateExpression(expression);
 
   // Output to LCD
-  char tmp[MAX_INPUTS] = {'\0'};
+  char tmp[MAX_INPUTS + 1] = {'\0'};
   sprintf(tmp + strlen(tmp), "%d", result);
   lcd_pos(0, 0);
   lcd_puts2(tmp);
   lcd_pos(0, strlen(tmp));
 
-  // TODO: Copy result into buf
+  // Copy result into buf
+  for (uint8_t i = 0; i < MAX_INPUTS; i++) {
+    buf[i] = tmp[i];
+  }
 }
 
 static uint8_t precedence(char operation) {
