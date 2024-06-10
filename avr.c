@@ -1,5 +1,6 @@
 #include "avr.h"
 #include "lcd.h"
+#include <stdlib.h>
 
 void avr_init(void) {
   WDTCR = 15;
@@ -7,6 +8,18 @@ void avr_init(void) {
   // set up LCD
   lcd_init();
   cursor_blink_on();
+  seed_random();
+}
+
+void seed_random() {
+  // Use the readings from the ADC to generate a seed
+  // The ADC should be reading essentially noise, which can be a viable option
+  // for generating a unique seed
+  ADMUX = 0b01000000;
+  ADCSRA = 0b11000000;
+  while (GET_BIT(ADCSRA, 6))
+    ;
+  srand(ADC);
 }
 
 void wait_ms(unsigned short msec) {

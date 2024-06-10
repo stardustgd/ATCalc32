@@ -19,6 +19,7 @@
 
 void avr_init(void);
 
+void seed_random(void);
 void wait_ms(unsigned short msec);
 void wait_us(unsigned short usec);
 
