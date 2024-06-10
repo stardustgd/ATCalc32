@@ -6,7 +6,7 @@ extern CalcState calcState;
 
 void inputHandler(CalcState *calcState);
 void updateCalc(CalcState *calcState);
-void calculatorMode();
+void calculatorMode(CalcState *calcState);
 void convertToPostfix(const char *infix, char *postfix);
 long long evaluateExpression(const char *postfix);
 

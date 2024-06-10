@@ -12,7 +12,7 @@
 #define MAX_INPUTS 32
 
 static void clearInput(char *buf);
-static void getInput(char *buf);
+static void getInput(char *buf, CalcState *calcState);
 static bool validateInput(char *buf);
 static void calculateInput(char *buf);
 static long long evaluateArithmetic(long long a, long long b, char operation);
@@ -34,20 +34,20 @@ void updateCalc(CalcState *calcState) {
     cursor_blink_on();
     lcd_clr();
     lcd_pos(0, 0);
-    calculatorMode();
+    calculatorMode(calcState);
     break;
   case MODE_QUIZ:
     cursor_blink_off();
-    quizStart();
+    quizStart(calcState);
     wait_ms(200);
     break;
   }
 }
 
-void calculatorMode() {
+void calculatorMode(CalcState *calcState) {
   char input[MAX_INPUTS + 1] = {'\0'};
 
-  getInput(input);
+  getInput(input, calcState);
 }
 
 static void clearInput(char *buf) {
@@ -55,7 +55,7 @@ static void clearInput(char *buf) {
   lcd_clr();
 }
 
-static void getInput(char *buf) {
+static void getInput(char *buf, CalcState *calcState) {
   bool valid = false;
   uint8_t entries = 0;
   uint8_t lcd_x = 0;
@@ -96,7 +96,10 @@ static void getInput(char *buf) {
     }
 
     if (input == POUND) {
-      if (validateInput(buf)) {
+      if (strcmp(buf, "+-*/") == 0) {
+        *calcState = MODE_QUIZ;
+        valid = true;
+      } else if (validateInput(buf)) {
         lcd_clr();
         calculateInput(buf);
         entries = strlen(buf);

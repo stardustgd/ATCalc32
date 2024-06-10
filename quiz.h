@@ -1,6 +1,7 @@
 #ifndef QUIZ_H
 #define QUIZ_H
 
+#include "calculator.h"
 #include "stdint.h"
 
 #define NUM_QUESTIONS 10
@@ -14,7 +15,7 @@ typedef struct {
   uint8_t problemLength;
 } MathProblem;
 
-void quizStart();
+void quizStart(CalcState *calcState);
 MathProblem generateQuestion();
 
 #endif

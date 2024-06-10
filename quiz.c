@@ -1,6 +1,5 @@
 #include "quiz.h"
 #include "avr.h"
-#include "calculator.h"
 #include "lcd.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +10,9 @@ const char OPERATORS[] = {'+', '-', '*'};
 void displayQuestion();
 void formatProblem(MathProblem *problem);
 
-void quizStart() {
+void quizStart(CalcState *calcState) {
+  lcd_clr();
+
   for (int8_t i = 0; i < 3; i++) {
     wait_ms(500);
     lcd_pos_and_puts("Quiz Time!", 0, 3);
@@ -25,6 +26,8 @@ void quizStart() {
   for (uint8_t i = 0; i < NUM_QUESTIONS; i++) {
     displayQuestion();
   }
+
+  *calcState = MODE_CALCULATE;
 }
 
 void displayQuestion() {
