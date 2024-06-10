@@ -2,6 +2,7 @@
 #include "avr.h"
 #include "keypad.h"
 #include "lcd.h"
+#include "quiz.h"
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -14,9 +15,7 @@ static void clearInput(char *buf);
 static void getInput(char *buf);
 static bool validateInput(char *buf);
 static void calculateInput(char *buf);
-static void convertToPostfix(const char *infix, char *postfix);
 static long long evaluateArithmetic(long long a, long long b, char operation);
-static long long evaluateExpression(const char *postfix);
 
 void inputHandler(CalcState *calcState) {
   switch (getKey()) {
@@ -32,13 +31,14 @@ void inputHandler(CalcState *calcState) {
 void updateCalc(CalcState *calcState) {
   switch (*calcState) {
   case MODE_CALCULATE:
+    cursor_blink_on();
     lcd_clr();
     lcd_pos(0, 0);
     calculatorMode();
     break;
   case MODE_QUIZ:
-    lcd_clr();
-    lcd_pos_and_puts("quiz", 0, 0);
+    cursor_blink_off();
+    quizStart();
     wait_ms(200);
     break;
   }
@@ -192,7 +192,7 @@ static uint8_t precedence(char operation) {
   return 0;
 }
 
-static void convertToPostfix(const char *infix, char *postfix) {
+void convertToPostfix(const char *infix, char *postfix) {
   char stack[MAX_INPUTS * 2];
   int8_t stackTopIndex = -1;
   uint8_t resultIndex = 0;
@@ -240,7 +240,7 @@ static long long evaluateArithmetic(long long a, long long b, char operation) {
   return 0;
 }
 
-static long long evaluateExpression(const char *postfix) {
+long long evaluateExpression(const char *postfix) {
   long long stack[MAX_INPUTS];
   int8_t stackTopIndex = -1;
   uint8_t postfixLength = strlen(postfix);
