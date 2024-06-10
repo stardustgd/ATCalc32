@@ -15,8 +15,8 @@ static void getInput(char *buf);
 static bool validateInput(char *buf);
 static void calculateInput(char *buf);
 static void convertToPostfix(const char *infix, char *postfix);
-static int evaluateArithmetic(int a, int b, char operation);
-static int evaluateExpression(const char *postfix);
+static long long evaluateArithmetic(long long a, long long b, char operation);
+static long long evaluateExpression(const char *postfix);
 
 void inputHandler(CalcState *calcState) {
   switch (getKey()) {
@@ -74,16 +74,16 @@ static void getInput(char *buf) {
     } else if (input != NONE && input != POUND && entries < MAX_INPUTS) {
       switch (input) {
       case A:
-        sprintf(buf + strlen(buf), "%s", "+");
+        sprintf(buf + strlen(buf), "%s", "+\0");
         break;
       case B:
-        sprintf(buf + strlen(buf), "%s", "-");
+        sprintf(buf + strlen(buf), "%s", "-\0");
         break;
       case C:
-        sprintf(buf + strlen(buf), "%s", "*");
+        sprintf(buf + strlen(buf), "%s", "*\0");
         break;
       case D:
-        sprintf(buf + strlen(buf), "%s", "/");
+        sprintf(buf + strlen(buf), "%s", "/\0");
         break;
       default:
         sprintf(buf + strlen(buf), "%c%c", getKeyCode(input), '\0');
@@ -168,11 +168,11 @@ static void calculateInput(char *buf) {
   convertToPostfix(buf, expression);
 
   // After conversion, evaulate the expression
-  int result = evaluateExpression(expression);
+  long result = evaluateExpression(expression);
 
   // Output to LCD
   char tmp[MAX_INPUTS + 1] = {'\0'};
-  sprintf(tmp + strlen(tmp), "%d", result);
+  sprintf(tmp + strlen(tmp), "%ld", result);
   lcd_pos_and_puts(tmp, 0, 0);
   lcd_pos(0, strlen(tmp));
 
@@ -194,7 +194,7 @@ static uint8_t precedence(char operation) {
 
 static void convertToPostfix(const char *infix, char *postfix) {
   char stack[MAX_INPUTS * 2];
-  size_t stackTopIndex = -1;
+  int8_t stackTopIndex = -1;
   uint8_t resultIndex = 0;
   uint8_t infixLength = strlen(infix);
 
@@ -225,7 +225,7 @@ static void convertToPostfix(const char *infix, char *postfix) {
   postfix[resultIndex] = '\0';
 }
 
-static int evaluateArithmetic(int a, int b, char operation) {
+static long long evaluateArithmetic(long long a, long long b, char operation) {
   switch (operation) {
   case '+':
     return a + b;
@@ -240,22 +240,22 @@ static int evaluateArithmetic(int a, int b, char operation) {
   return 0;
 }
 
-static int evaluateExpression(const char *postfix) {
-  int stack[MAX_INPUTS];
-  size_t stackTopIndex = -1;
+static long long evaluateExpression(const char *postfix) {
+  long long stack[MAX_INPUTS];
+  int8_t stackTopIndex = -1;
   uint8_t postfixLength = strlen(postfix);
 
   for (uint8_t i = 0; i < postfixLength; i++) {
     if (isdigit(postfix[i])) {
-      long num = 0;
+      long long num = 0;
       while (isdigit(postfix[i])) {
         num = num * 10 + (postfix[i++] - '0');
       }
 
       stack[++stackTopIndex] = num;
     } else if (postfix[i] != ' ') {
-      int num2 = stack[stackTopIndex--];
-      int num1 = stack[stackTopIndex--];
+      long long num2 = stack[stackTopIndex--];
+      long long num1 = stack[stackTopIndex--];
       stack[++stackTopIndex] = evaluateArithmetic(num1, num2, postfix[i]);
     }
   }
